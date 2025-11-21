@@ -1,64 +1,75 @@
 <?php
-$bdd_fichier = 'labyrinthe.db';
-$sqlite = new SQLite3($bdd_fichier);
 
-// ---------------------
-// Déterminer la salle actuelle
-// ---------------------
-$current_id = isset($_GET['id']) ? intval($_GET['id']) : null;
+	//Documentation php pour sqlite : https://www.php.net/manual/en/book.sqlite3.php
+	
+	/* Paramètres */
+	$bdd_fichier = 'labyrinthe.db';	
+	$type = 'vide';			
+	
 
-if (!$current_id) {
-    $res_depart = $sqlite->query("SELECT id FROM couloir WHERE type='depart'");
-    $row_depart = $res_depart->fetchArray(SQLITE3_ASSOC);
-    if ($row_depart) {
-        $current_id = $row_depart['id'];
-    } else {
-        die("Erreur : aucune salle de départ trouvée dans la base.");
-    }
+	$sqlite = new SQLite3($bdd_fichier);		
+	
+
+	$sql = 'SELECT couloir.id, couloir.type FROM couloir WHERE type=:type';
+
+if (isset($_GET['id'])) {
+    $current_id = $_GET['id'];
+} else {
+    
+    $sql_depart = "SELECT id FROM couloir WHERE type = 'depart'"; 
+	$res_depart = $sqlite->query($sql_depart);
+	$row_depart = $res_depart->fetchArray(SQLITE3_ASSOC);
+	$depart_id = $row_depart['id'];
+
 }
+	
 
-// ---------------------
-// Récupérer les passages de la salle actuelle
-// ---------------------
-$sql_possible = "SELECT * FROM passage WHERE couloir1=$current_id OR couloir2=$current_id";
-$result = $sqlite->query($sql_possible);
+	$sql_possible = 'SELECT * from passage';
+	
 
-// ---------------------
-// Affichage HTML
-// ---------------------
-echo "<!DOCTYPE html>\n<html lang='fr'><head><meta charset='UTF-8'><title>Labyrinth Simulator.IO</title></head><body>";
-echo "<h1>Labyrinth Simulator.IO</h1>";
-echo "<h2>Vous êtes dans la salle $current_id</h2>";
 
-// ---------------------
-// Affichage des passages possibles
-// ---------------------
-$has_passages = false;
-echo "<ul>";
 
-while ($passage = $result->fetchArray(SQLITE3_ASSOC)) {
-    // Déterminer la salle de destination et la direction
-    if ($passage['couloir1'] == $current_id) {
-        $dest = $passage['couloir2'];
-        $dir  = $passage['position1'];
-    } elseif ($passage['couloir2'] == $current_id) {
-        $dest = $passage['couloir1'];
-        $dir  = $passage['position2'];
-    } else {
-        continue;
-    }
+	
+	$requete = $sqlite -> prepare($sql_possible);	
+	$requete -> bindValue(':type', $type, SQLITE3_TEXT);
+	
+	$result = $requete -> execute();	
 
-    // Afficher le lien vers la salle
-    echo '<li><a href="labyrinthe.php?id='.$dest.'">Aller vers la salle '.$dest.' ('.$dir.')</a></li>';
-    $has_passages = true;
-}
+	
+	echo "<!DOCTYPE html>\n";	
+	echo "<html lang=\"fr\"><head><meta charset=\"UTF-8\">\n";	
+	echo "<title>Liste des couloirs</title>\n";
+	echo "</head>\n";
+	
+	echo "<body>\n";
+	echo "<h1>LabyrinthSimulator.io</h1>\n";
+	echo "<ul>";
+	echo "<h2> Vous êtes dans la salle $depart_id </h2>";
+	while($passage = $result -> fetchArray(SQLITE3_ASSOC)) {
+		if ($passage['couloir1'] == $depart_id ){
+		
+            $dir = $passage['position2'];
+            $dest = $passage['couloir2'];
+			echo "<button type='submit' name='button' value='$dest'>Aller vers la salle $dest vers $dir</button>\n";
+			$depart_id = $_POST[$dest];
+		}
+		if ($passage['couloir2'] == $depart_id){
+		    $dir = $passage['position1'];
+            $dest = $passage['couloir1'];
+			
+			echo "<button type='submit' name='button' value='$dest'>Aller vers la salle $dest vers $dir</button>\n";
+        
+		}
+	}
 
-if (!$has_passages) {
-    echo "<li>Pas de sorties depuis cette salle. Vous êtes coincé !</li>";
-}
+	echo "</ul>";
+	echo "</body>\n";
+	echo "</html>\n";
+	
+	
 
-echo "</ul>";
-echo "</body></html>";
 
-$sqlite->close();
+	$sqlite -> close();	
 ?>
+
+
