@@ -6,7 +6,7 @@ session_start();
 $bdd_fichier = 'labyrinthe.db';
 $sqlite = new SQLite3($bdd_fichier);
 
-// --- Réinitialisation du jeu si le paramètre "reset" est présent ---
+// Réinitialisation du jeu si le paramètre "reset" est présent
 if (isset($_GET['reset'] )) {
     $_SESSION['nombre_coup'] = 0; // Réinitialise le nombre de déplacements
     $_SESSION['nombre_cle'] = 0;  // Réinitialise le nombre de clés
@@ -15,11 +15,11 @@ if (isset($_GET['reset'] )) {
     exit;
 }
 
-// --- Récupération des 10 meilleurs joueurs ---
+//Récupération des 10 meilleurs joueurs 
 $listemeilleurjoueur = "SELECT Nom_joueur, score FROM JOUEUR order by score limit 10 "; 
 $res_liste = $sqlite->query($listemeilleurjoueur);
 
-// --- Enregistrement du score si le joueur soumet son nom ---
+//  Enregistrement du score si le joueur soumet son nom
 if (isset($_POST['name'])) {
     $nom = $_POST['name'];
     $score = $_POST['score'];
@@ -40,7 +40,7 @@ if (isset($_POST['name'])) {
         $ajoutjoueur->execute();
     }
     else {
-        // Met à jour le score du joueur existant
+        // Met a jour le score du joueur existant
         $majjoueur = $sqlite->prepare("UPDATE JOUEUR SET score = :score WHERE Nom_joueur = :nom");
         $majjoueur->bindValue(':score', $score, SQLITE3_INTEGER);
         $majjoueur->bindValue(':nom', $nom, SQLITE3_TEXT);
@@ -51,36 +51,36 @@ if (isset($_POST['name'])) {
     echo "<h2>Score enregistré ! Bravo $nom 🎉</h2>";
 }
 
-// --- Récupère l'ID du couloir de départ depuis la base ---
+// Récupère l'ID du couloir de départ depuis la base
 $sql_depart = "SELECT id FROM couloir WHERE type = 'depart'";
 $res_depart = $sqlite->query($sql_depart);
 $row_depart = $res_depart->fetchArray(SQLITE3_ASSOC);
 $debut = $row_depart['id'];
 
-// --- Initialisation des variables de session si elles n'existent pas ---
+// initialisation des variables de session si elles n'existent pas
 if (!isset($_SESSION['nombre_coup'])) $_SESSION['nombre_coup'] = 0;
 if (!isset($_SESSION['nombre_cle'])) $_SESSION['nombre_cle'] = 0;
 if (!isset($_SESSION['cle'])) $_SESSION['cle'] = [];
 
-// --- Récupération des valeurs depuis la session ---
+// récupération des valeurs depuis la session 
 $nombre_coup = $_SESSION['nombre_coup'];
 $nombre_cle  = $_SESSION['nombre_cle'];
 $listecle    = $_SESSION['cle'];
 
-// --- Détermination de la salle actuelle (GET 'id') ou départ ---
+// Détermination de la salle actuelle (GET 'id') ou départ 
 $depart_id = isset($_GET['id']) ? $_GET['id'] : $debut;
 
-// --- Utilisation d'une clé si le joueur passe une grille ---
+// Utilisation d'une clé si le joueur passe une grille 
 if (isset($_GET["usekey"]) && $_GET["usekey"] == 1 && $nombre_cle > 0) {
     $nombre_cle -= 1;
 }
 
-// --- Récupère le type de la salle actuelle (normale, clé, sortie) ---
+// Récupère le type de la salle actuelle (normale, clé, sortie) 
 $sql_cle = "SELECT type FROM couloir WHERE id = $depart_id";
 $res_cle = $sqlite->query($sql_cle);
 $cle_cle = $res_cle->fetchArray(SQLITE3_ASSOC);
 
-// --- Début du HTML ---
+// Début du HTML 
 echo "<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'><title>LabyrinthSimulator</title>";
 echo "<link rel='stylesheet' href='style.css'>";
 echo "</head><body>";
@@ -89,7 +89,7 @@ echo "<h1>LabyrinthSimulator.io</h1>";
 // Bouton pour accéder aux règles du jeu
 echo "<a href='regles.php'><button>Règles du jeu</button></a>";
 
-// --- Si la salle est la sortie, le joueur a gagné ---
+// -Si la salle est la sortie, le joueur a gagné
 if ($cle_cle['type'] == 'sortie') {
 
     echo "<h1>VOUS AVEZ GAGNÉ LE JEU !! 🎉</h1>";
@@ -117,7 +117,7 @@ if ($cle_cle['type'] == 'sortie') {
     exit; // Fin de script après victoire
 }
 
-// --- Affiche la salle actuelle ---
+// Affiche la salle actuelle
 echo "<h2>Vous êtes dans la salle $depart_id</h2>";
 
 // Tableau pour afficher les directions
@@ -128,25 +128,25 @@ $direction = [
     "O" => "⬅"
 ];
 
-// --- Ramassage d'une clé si présente et non déjà collectée ---
+// Ramassage d'une clé si présente et non déjà collectée
 if ($cle_cle['type'] == 'cle' && !in_array($depart_id, $listecle)) {
     $nombre_cle += 1;           // Augmente le nombre de clés
     $listecle[] = $depart_id;   // Marque la clé comme ramassée
     echo "<h2><strong>Vous trouvez une clé ! 🗝️</strong></h2>";
 }
 
-// --- Affichage des infos clés et déplacements ---
+// Affichage des infos clés et déplacements
 echo "<h2>Clés : $nombre_cle 🗝️</h2>";
 echo "<h2>Nombre de coups : $nombre_coup</h2>";
 
 // Incrémente le nombre de coups (déplacements)
 $nombre_coup++;
 
-// --- Récupération des passages possibles depuis la base ---
+// Récupération des passages possibles depuis la base
 $sql_possible = 'SELECT * FROM passage';
 $result_passage = $sqlite->query($sql_possible);
 
-// --- Boucle sur tous les passages pour afficher les boutons ---
+// Boucle sur tous les passages pour afficher les boutons 
 while ($passage = $result_passage->fetchArray(SQLITE3_ASSOC)) {
 
     // Cas où le joueur est dans couloir1
@@ -185,7 +185,7 @@ while ($passage = $result_passage->fetchArray(SQLITE3_ASSOC)) {
     }
 }
 
-// --- Sauvegarde des données dans la session ---
+//Sauvegarde des données dans la session
 $_SESSION['nombre_cle'] = $nombre_cle;
 $_SESSION['nombre_coup'] = $nombre_coup;
 $_SESSION['cle'] = $listecle;
