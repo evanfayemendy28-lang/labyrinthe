@@ -68,7 +68,7 @@ $nombre_cle  = $_SESSION['nombre_cle'];
 $listecle    = $_SESSION['cle'];
 
 // Détermination de la salle actuelle (GET 'id') ou départ 
-$depart_id = isset($_GET['id']) ? $_GET['id'] : $debut;
+$depart_id = isset($_GET['id']) ? intval($_GET['id']) : $debut;
 
 // Utilisation d'une clé si le joueur passe une grille 
 if (isset($_GET["usekey"]) && $_GET["usekey"] == 1 && $nombre_cle > 0) {
@@ -80,6 +80,9 @@ $sql_cle = "SELECT type FROM couloir WHERE id = $depart_id";
 $res_cle = $sqlite->query($sql_cle);
 $cle_cle = $res_cle->fetchArray(SQLITE3_ASSOC);
 
+$sql_possible = 'SELECT * FROM passage';
+
+
 // Début du HTML 
 echo "<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'><title>LabyrinthSimulator</title>";
 echo "<link rel='stylesheet' href='style.css'>";
@@ -89,9 +92,10 @@ echo "<h1>LabyrinthSimulator.io</h1>";
 // Bouton pour accéder aux règles du jeu
 echo "<a href='regles.php'><button>Règles du jeu</button></a>";
 
+
 // -Si la salle est la sortie, le joueur a gagné
 if ($cle_cle['type'] == 'sortie') {
-
+    echo '<audio src="win.mp3" autoplay loop></audio>';
     echo "<h1>VOUS AVEZ GAGNÉ LE JEU !! 🎉</h1>";
     echo "<h1>VOTRE SCORE : $nombre_coup</h1>";
 
@@ -125,8 +129,21 @@ $direction = [
     "N" => "⬆",
     "S" => "⬇",
     "E" => "➡",
-    "O" => "⬅"
+    "O" => "⬅",
+    "C" => "✨"
 ];
+
+$map = [
+    'N'  => '🧱',
+    'S'  => '🧱',
+    'E'  => '🧱',
+    'O'  => '🧱',
+    'NE' => '🧱',
+    'NO' => '🧱',
+    'SE' => '🧱',
+    'SO' => '🧱'
+];
+
 
 // Ramassage d'une clé si présente et non déjà collectée
 if ($cle_cle['type'] == 'cle' && !in_array($depart_id, $listecle)) {
@@ -151,39 +168,78 @@ while ($passage = $result_passage->fetchArray(SQLITE3_ASSOC)) {
 
     // Cas où le joueur est dans couloir1
     if ($passage['couloir1'] == $depart_id) {
-        $dir  = $direction[$passage['position2']];
-        $dest = $passage['couloir2'];
 
+        $dirCode = $passage['position2']; 
+        $dirIcon = $direction[$dirCode];
+        $dest    = $passage['couloir2'];
+
+        $map[$passage['position2']] = '🔒'; 
         if ($passage['type'] == 'grille') {
             if ($nombre_cle == 0) {
-                // Bouton bloqué si pas de clé
-                echo "<button>Il faut une clé → salle $dest $dir</button><br>";
-            } else {
-                // Lien pour utiliser une clé et passer la grille
-                echo "<a href='?id=$dest&usekey=1'><button>Ouvrir grille → $dest $dir</button></a><br>";
-            }
-        } else {
-            // Bouton normal pour déplacement
-            echo "<a href='?id=$dest'><button>Salle $dest $dir</button></a><br>";
+             echo "<button>Il faut une clé → salle $dest $dirIcon</button><br>"; 
+            } 
+            else { 
+            echo "<a href='?id=$dest&usekey=1'><button>Ouvrir grille → $dest $dirIcon</button></a><br>"; 
         }
+        }
+        else {
+            $map[$dirCode] = '🚪';
+            echo "<a href='?id=$dest'><button>Salle $dest $dirIcon</button></a><br>";
+        }
+        
     }
 
     // Cas où le joueur est dans couloir2
     if ($passage['couloir2'] == $depart_id) {
-        $dir  = $direction[$passage['position1']];
-        $dest = $passage['couloir1'];
+        
+        
 
+        $dirCode = $passage['position1']; 
+        $dirIcon = $direction[$dirCode];
+        $dest    = $passage['couloir1'];
+
+        $map[$passage['position1']] = '🔒'; 
         if ($passage['type'] == 'grille') {
             if ($nombre_cle == 0) {
-                echo "<button>Il faut une clé → salle $dest $dir</button><br>";
-            } else {
-                echo "<a href='?id=$dest&usekey=1'><button>Ouvrir grille → $dest $dir</button></a><br>";
-            }
-        } else {
-            echo "<a href='?id=$dest'><button>Salle $dest $dir</button></a><br>";
+             echo "<button>Il faut une clé → salle $dest $dirIcon</button><br>"; 
+            } 
+            else { 
+            echo "<a href='?id=$dest&usekey=1'><button>Ouvrir grille → $dest $dirIcon</button></a><br>"; 
         }
-    }
+        }
+        
+        else {
+            $map[$dirCode] = '🚪';
+            echo "<a href='?id=$dest'><button>Salle $dest $dirIcon</button></a><br>";
+        }
+        
+
 }
+}
+
+echo "<div class='minimap'>";
+
+echo "<div class='map-row'>";
+echo "<div class='map-cell'>{$map['NO']}</div>";
+echo "<div class='map-cell'>{$map['N']}</div>";
+echo "<div class='map-cell'>{$map['NE']}</div>";
+echo "</div>";
+
+echo "<div class='map-row'>";
+echo "<div class='map-cell'>{$map['O']}</div>";
+echo "<div class='map-cell player'>🧍‍♂️</div>";
+echo "<div class='map-cell'>{$map['E']}</div>";
+echo "</div>";
+
+echo "<div class='map-row'>";
+echo "<div class='map-cell'>{$map['SO']}</div>";
+echo "<div class='map-cell'>{$map['S']}</div>";
+echo "<div class='map-cell'>{$map['SE']}</div>";
+echo "</div>";
+
+echo "</div>";
+
+
 
 //Sauvegarde des données dans la session
 $_SESSION['nombre_cle'] = $nombre_cle;
@@ -193,6 +249,16 @@ $_SESSION['cle'] = $listecle;
 // Bouton pour recommencer la partie
 echo "<br>";
 echo "<a href='?reset=1'><button>RECOMMENCER</button></a>";
+
+echo "<div class='classement'><h2>🏆 Top 10</h2><ul>";
+
+$sql_top = $sqlite->query("SELECT Nom_joueur, score FROM JOUEUR ORDER BY score LIMIT 10");
+while ($j = $sql_top->fetchArray(SQLITE3_ASSOC)) {
+    echo "<li><strong>{$j['Nom_joueur']}</strong> — {$j['score']}</li>";
+}
+
+echo "</ul></div>";
+
 
 // Fin du HTML et fermeture de la base
 echo "</body></html>";
