@@ -219,22 +219,22 @@ while ($passage = $result_passage->fetchArray(SQLITE3_ASSOC)) {
 
 echo "<div class='minimap'>";
 
-echo "<div class='map-row'>";
-echo "<div class='map-cell'>{$map['NO']}</div>";
-echo "<div class='map-cell'>{$map['N']}</div>";
-echo "<div class='map-cell'>{$map['NE']}</div>";
+echo "<div class='map-ligne'>";
+echo "<div class='map-carre'>{$map['NO']}</div>";
+echo "<div class='map-carre'>{$map['N']}</div>";
+echo "<div class='map-carre'>{$map['NE']}</div>";
 echo "</div>";
 
-echo "<div class='map-row'>";
-echo "<div class='map-cell'>{$map['O']}</div>";
-echo "<div class='map-cell player'>🧍‍♂️</div>";
-echo "<div class='map-cell'>{$map['E']}</div>";
+echo "<div class='map-ligne'>";
+echo "<div class='map-carre'>{$map['O']}</div>";
+echo "<div class='map-carre player'>🧍‍♂️</div>";
+echo "<div class='map-carre'>{$map['E']}</div>";
 echo "</div>";
 
-echo "<div class='map-row'>";
-echo "<div class='map-cell'>{$map['SO']}</div>";
-echo "<div class='map-cell'>{$map['S']}</div>";
-echo "<div class='map-cell'>{$map['SE']}</div>";
+echo "<div class='map-ligne'>";
+echo "<div class='map-carre'>{$map['SO']}</div>";
+echo "<div class='map-carre'>{$map['S']}</div>";
+echo "<div class='map-carre'>{$map['SE']}</div>";
 echo "</div>";
 
 echo "</div>";
