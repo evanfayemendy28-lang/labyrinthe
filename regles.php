@@ -1,45 +1,69 @@
 <?php
-echo "<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'><title>LabyrinthSimulator</title>";
+// debut du document html
+echo "<!DOCTYPE html><html lang='fr'><head>";
+echo "<meta charset='UTF-8'><title>labyrinthsimulator</title>";
+
+// lien vers le fichier css
 echo "<link rel='stylesheet' href='style.css'>";
 echo "</head><body>";
 
-echo "<h1>LabyrinthSimulator.io</h1>";
-echo "<a href='exemple sqlite.php?reset=1'><button>Jouer au jeu</button></a>";
+// titre principale du site
+echo "<h1>labyrinthsimulator.io</h1>";
 
+// bouton pour lancer le jeu
+echo "<a href='exemple sqlite.php?reset=1'><button>jouer au jeu</button></a>";
+
+// zone avec fond pour le texte des regle
 echo '<div class="texte-fond">';
 
-echo "<h1> 📜 Règles du jeu — LabyrintheSimulator.io</h1>";
-echo "<h2> 🚩 Objectif : </h2> ";
-echo "<h3> Trouver la sortie du labyrinthe en effectuant le moins de déplacements possible. </h3>";
+// titre des regles
+echo "<h1>regles du jeu labyrinthsimulator.io</h1>";
 
-echo "<h2> 🚶‍♂️ Déplacements : </h2> ";
-echo "<h3> Vous pouvez vous déplacer uniquement vers les couloirs directement connectés à votre position actuelle. <br>
-Les directions possibles (Nord, Sud, Est, Ouest) sont indiquées sur chaque page de couloir.<br>
-Chaque déplacement compte, alors réfléchissez bien avant d’avancer ! </h3>";
+// objectif du jeu
+echo "<h2>objectif</h2>";
+echo "<h3>trouver la sortie du labyrinthe avec le moins de deplacements possible</h3>";
 
-echo "<h2> 🗝️ Clés et grilles : </h2> ";
-echo "<h3> Une grille nécessite 1 clé pour être ouverte. <br> 
-Chaque clé est consommée lors de l’ouverture d’une grille. <br>
-Les clés sont ramassées automatiquement en entrant dans un couloir qui en contient.<br>
-Le nombre de clés que vous possédez est toujours affiché à l’écran.</h3>";
+// explication des deplacements
+echo "<h2>deplacements</h2>";
+echo "<h3>
+vous pouvez vous deplacer seulement vers les couloirs relies a votre position<br>
+les directions possibles sont affichees a l ecran<br>
+chaque deplacement augmente le score
+</h3>";
 
-echo "<h2> 🧭 Orientation et exploration : </h2> ";
-echo "<h3> Le labyrinthe peut contenir des impasses, des boucles ou des chemins détournés.<br>
-L’orientation dépend de la direction d’où vous venez : les directions restent cohérentes (Nord/Sud/Est/Ouest).<br><br>
-Pensez à observer : <br><br>
-l’identifiant du couloir,<br>
-les directions disponibles,<br>
-les clés ramassées,<br>
-les grilles devant vous. </h3>";
+// explication des cles et grilles
+echo "<h2>cles et grilles</h2>";
+echo "<h3>
+une grille demande une cle pour etre ouverte<br>
+la cle est consommee apres ouverture<br>
+les cles sont ramassees automatiquement<br>
+le nombre de cles est toujours visible
+</h3>";
 
-echo "<h2> 🏁 Fin de la partie : </h2> ";
-echo "<h3> Vous gagnez en trouvant la sortie. <br>
-🎉 Un message de victoire<br>
-🧮 Votre score total <br>
-📝 Un formulaire pour enregistrer votre nom dans les meilleurs scores </h3>";
+// orientation dans le labyrinthe
+echo "<h2>orientation et exploration</h2>";
+echo "<h3>
+le labyrinthe peut contenir des impasses ou des boucles<br>
+les directions restent coherentes nord sud est ouest<br><br>
+pensez a observer<br>
+l id de la salle<br>
+les directions possibles<br>
+les cles<br>
+les grilles
+</h3>";
+
+// fin de partie
+echo "<h2>fin de la partie</h2>";
+echo "<h3>
+vous gagnez en trouvant la sortie<br>
+un message de victoire apparait<br>
+votre score est affiche<br>
+vous pouvez enregistrer votre nom
+</h3>";
+
+// fin de la zone de texte
 echo "</div>";
 
+// fin du document html
 echo "</body></html>";
-
-
 ?>
